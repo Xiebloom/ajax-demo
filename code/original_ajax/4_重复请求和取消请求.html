@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4</title>
+</head>
+
+<body>
+    <div id="app">
+        <button @click="sendIt">点击发送</button>
+        <button @click="cancelIt">点击取消</button>
+        <div>{{msg}}</div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                msg: '',
+                xhr: null,
+                isSending: false,
+            },
+            methods: {
+                sendIt: function() {
+                    console.log('i will send it');
+                    if (this.isSending) this.xhr.abort();
+
+                    this.xhr = new XMLHttpRequest();
+                    this.isSending = true;
+                    this.xhr.responseType = 'json'
+
+                    // 设置时间阈值，超时取消
+                    this.xhr.timeout = 2000;
+                    // 超时事件
+                    this.xhr.ontimeout = () => {
+                        alert('超时');
+                    };
+                    // 断网事件
+                    this.xhr.onerror = () => {
+                        alert('断网')
+                    };
+                    this.xhr.open('POST', 'http://127.0.0.1:8000/server');
+                    // content-type 设置请求体类型
+                    // 参数查询字符串的固定写法
+                    this.xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    this.xhr.send('a=100&b=2900&c=300');
+
+                    // 判断状态变化
+                    this.xhr.onreadystatechange = () => {
+                        if (this.xhr.readyState == 4) {
+                            // 修改表示变量，表示正在发送
+                            this.isSending = false;
+                            if (this.xhr.status >= 200 && this.xhr.status < 300) {
+                                console.log(typeof this.xhr.response);
+                                this.msg = this.xhr.response.name;
+                            }
+                        }
+                    }
+                },
+                cancelIt: function() {
+                    console.log(this.xhr);
+                    this.xhr.abort();
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

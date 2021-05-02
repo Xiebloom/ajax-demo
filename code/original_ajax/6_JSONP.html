@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSONP</title>
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" @blur="send" :value="msg">
+        <p></p>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        var handle = function(data) {
+            const p = document.querySelector("p")
+            p.innerHTML = data.msg;
+            console.log(data);
+        }
+        var app = new Vue({
+            el: "#app",
+            data: {
+                msg: '',
+            },
+            methods: {
+                send: function() {
+                    let username = this.msg;
+                    const script = document.createElement('script');
+                    script.src = 'http://127.0.0.1:8000/check';
+                    document.body.appendChild(script);
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

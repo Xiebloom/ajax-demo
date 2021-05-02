@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-timeout</title>
+    <style>
+        .result {
+            height: 300px;
+            width: 200px;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="result" @mouseover="mouseover">{{msg}}</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                msg: '',
+            },
+            methods: {
+                mouseover: function() {
+                    const xhr = new XMLHttpRequest();
+                    xhr.responseType = 'json'
+
+                    // 设置时间阈值，超时取消
+                    xhr.timeout = 1000;
+                    // 超时事件
+                    xhr.ontimeout = () => {
+                        alert('?');
+                    };
+                    // 断网事件
+                    xhr.onerror = () => {
+                        alert('?')
+                    };
+                    xhr.open('POST', 'http://127.0.0.1:8000/server');
+                    // content-type 设置请求体类型
+                    // 参数查询字符串的固定写法
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    xhr.send('a=100&b=2900&c=300');
+                    xhr.onreadystatechange = () => {
+                        if (xhr.readyState == 4) {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                console.log(typeof xhr.response);
+                                this.msg = xhr.response.name;
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
